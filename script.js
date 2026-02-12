@@ -364,24 +364,21 @@ document.addEventListener('keydown', function(event) {
 
 // 지도 앱 열기
 function openKakaoMap() {
-    // 실제 장소명으로 변경하세요
-    const placeName = '예식장 이름';
+    const placeName = '신도림 라마다 호텔';
     const url = `https://map.kakao.com/link/search/${encodeURIComponent(placeName)}`;
     window.open(url, '_blank');
 }
 
 function openNaverMap() {
-    // 예식장 정보로 변경하세요
-    const placeName = '예식장 이름';
-    const address = '예식장 주소';
+    const placeName = '신도림 라마다 호텔';
+    const address = '서울특별시 구로구 경인로 613';
     const url = `https://map.naver.com/v5/search/${encodeURIComponent(placeName)}`;
     window.open(url, '_blank');
 }
 
 function openTmap() {
-    // 구글 지도로 변경 (티맵 대체)
-    const placeName = '예식장 이름';
-    const address = '예식장 주소';
+    const placeName = '신도림 라마다 호텔';
+    const address = '서울특별시 구로구 경인로 613';
 
     // 구글 지도 검색 URL (모바일/PC 모두 작동)
     const googleMapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`;
@@ -389,10 +386,9 @@ function openTmap() {
 }
 
 function openKakaoNavi() {
-    // 예식장 좌표로 변경하세요 (카카오맵에서 좌표 검색)
-    const placeName = '예식장 이름';
-    const latitude = 37.5665;  // 위도 (예: 서울시청)
-    const longitude = 126.9780; // 경도
+    const placeName = '신도림 라마다 호텔';
+    const latitude = 37.5084;  // 위도
+    const longitude = 126.8909; // 경도
     // 카카오내비 앱 스킴 (좌표로 목적지 설정)
     const kakaoNaviUrl = `kakaomap://route?ep=${latitude},${longitude}&by=CAR`;
 
@@ -917,8 +913,8 @@ function initCalendar() {
 
     // ⭐ 결혼식 날짜 설정 (여기를 변경하세요!)
     const year = 2025;  // 결혼식 년도
-    const month = 0; // 결혼식 월 (0=1월, 1=2월, ..., 11=12월)
-    const weddingDay = 1;  // 결혼식 일
+    const month = 2; // 결혼식 월 (0=1월, 1=2월, 2=3월, ..., 11=12월)
+    const weddingDay = 22;  // 결혼식 일
 
     // 해당 월의 첫 번째 날짜
     const firstDay = new Date(year, month, 1);
@@ -972,7 +968,7 @@ function initCountdown() {
     if (!countdownDays || !countdownHours || !countdownMinutes || !countdownSeconds) return;
 
     // ⭐ 결혼식 날짜와 시간 설정 (여기를 변경하세요!)
-    const weddingDate = new Date('2025-01-01T12:00:00');
+    const weddingDate = new Date('2025-03-22T15:40:00');
 
     function updateCountdown() {
         const now = new Date();
@@ -1028,7 +1024,7 @@ function initNaverMap() {
 
     // ⭐ 예식장 좌표 설정 (여기를 변경하세요!)
     // 좌표 찾는 법: 네이버 지도에서 예식장 검색 → 주소 복사 → "좌표 변환" 검색
-    const weddingLocation = new naver.maps.LatLng(37.5665, 126.9780);  // 예: 서울시청
+    const weddingLocation = new naver.maps.LatLng(37.5084, 126.8909);  // 신도림 라마다 호텔
 
     // 지도 옵션
     const mapOptions = {
@@ -1047,15 +1043,15 @@ function initNaverMap() {
     const marker = new naver.maps.Marker({
         position: weddingLocation,
         map: map,
-        title: '예식장 이름'  // ⭐ 예식장 이름 변경
+        title: '신도림 라마다 호텔 하늘정원홀'
     });
 
     // 정보창 내용
     const contentString = [
         '<div style="padding:10px;min-width:200px;line-height:1.5;">',
-        '   <h4 style="margin:0 0 10px 0;font-size:16px;font-weight:bold;">예식장 이름</h4>',  // ⭐ 변경
-        '   <p style="margin:0;font-size:13px;color:#666;">예식장 주소</p>',  // ⭐ 변경
-        '   <p style="margin:5px 0 0 0;font-size:13px;color:#666;">Tel. 000-0000-0000</p>',  // ⭐ 변경
+        '   <h4 style="margin:0 0 10px 0;font-size:16px;font-weight:bold;">신도림 라마다 호텔 하늘정원홀</h4>',
+        '   <p style="margin:0;font-size:13px;color:#666;">서울특별시 구로구 경인로 613 (구로동)</p>',
+        '   <p style="margin:5px 0 0 0;font-size:13px;color:#666;">Tel. 02-2109-5000</p>',
         '</div>'
     ].join('');
 
@@ -1100,7 +1096,7 @@ function shareKakao() {
         content: {
             // ⭐ 공유 메시지 내용 변경
             title: '김태진 ♡ 강소현 결혼식에 초대합니다.',
-            description: '0000년 00월 00일 0요일 오전 00시 \n예식장 이름',
+            description: '2025년 3월 22일 토요일 오후 3시 40분 \n신도림 라마다 호텔 하늘정원홀',
             imageUrl: 'YOUR_THUMBNAIL_IMAGE_URL',  // ⭐ 썸네일 이미지 URL
             link: {
                 mobileWebUrl: 'YOUR_WEDDING_WEBSITE_URL',  // ⭐ 청첩장 URL
