@@ -1099,7 +1099,7 @@ function shareKakao() {
         objectType: 'feed',
         content: {
             // ⭐ 공유 메시지 내용 변경
-            title: '신랑 ♡ 신부 결혼식에 초대합니다.',
+            title: '김태진 ♡ 강소현 결혼식에 초대합니다.',
             description: '0000년 00월 00일 0요일 오전 00시 \n예식장 이름',
             imageUrl: 'YOUR_THUMBNAIL_IMAGE_URL',  // ⭐ 썸네일 이미지 URL
             link: {
