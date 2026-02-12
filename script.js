@@ -1,17 +1,324 @@
 // 현재 이미지 인덱스
 let currentImageIndex = 0;
-const totalImages = 6;
+const totalImages = 9;
+
+// 방명록 수정 모드 (Firebase용 - messageId 저장)
+let editingMessageId = null;
+
+// 방명록 표시 개수 제한
+let displayedMessageCount = 3;
+
+// Firebase 방명록 전체 데이터 (전역 저장)
+window.allMessages = [];
+const galleryImages = [
+    'images/4.jpg',
+    'images/10.jpg',
+    'images/11.jpg',
+    'images/45.jpg',
+    'images/22.jpg',
+    'images/24.jpg',
+    'images/32.jpg',
+    'images/26.jpg',
+    'images/17.jpg'
+];
+
+let isMusicPlaying = false;
+let isFirstInteractionHandled = false;
 
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
+    window.scrollTo(0, 0);
+    initBackgroundMusic();
+    initTouchPrompt();
     loadMessages();
     initScrollAnimation();
+    initCalendar();
+    initCountdown();
+    initGallery();
+    initNaverMap();
 });
+
+// 배경음악 초기화
+function initBackgroundMusic() {
+    const music = document.getElementById('backgroundMusic');
+    const soundIcon = document.getElementById('soundIcon');
+
+    if (!music || !soundIcon) return;
+
+    // 볼륨 설정
+    music.volume = 0.5;
+    music.muted = true;
+    music.pause();
+
+    // 초기 아이콘 설정
+    isMusicPlaying = false;
+    updateSoundIcon(false);
+
+    // 터치 유도 화면이 없으면 원래 방식대로 첫 상호작용 리스너 추가
+    const touchPrompt = document.getElementById('touchPrompt');
+    if (!touchPrompt) {
+        attachFirstInteractionListener();
+    }
+}
+
+function updateSoundIcon(isPlaying) {
+    const soundIcon = document.getElementById('soundIcon');
+    if (!soundIcon) return;
+
+    if (isPlaying) {
+        soundIcon.src = 'images/soundon.svg';
+        soundIcon.alt = '사운드 켜기';
+    } else {
+        soundIcon.src = 'images/soundoff.svg';
+        soundIcon.alt = '사운드 끄기';
+    }
+}
+
+function attachFirstInteractionListener() {
+    if (isFirstInteractionHandled) return;
+    const handler = () => {
+        if (!isFirstInteractionHandled) {
+            startMusicAfterInteraction();
+        }
+        document.removeEventListener('click', handler);
+        document.removeEventListener('touchstart', handler);
+        document.removeEventListener('keydown', handler);
+    };
+    document.addEventListener('click', handler, { once: true });
+    document.addEventListener('touchstart', handler, { once: true });
+    document.addEventListener('keydown', handler, { once: true });
+}
+
+function startMusicAfterInteraction() {
+    const music = document.getElementById('backgroundMusic');
+    if (!music) return;
+
+    // 1초 후 음악 재생
+    setTimeout(() => {
+        music.muted = false;
+        music.play().then(() => {
+            isMusicPlaying = true;
+            isFirstInteractionHandled = true;
+            updateSoundIcon(true);
+        }).catch(() => {
+            isMusicPlaying = false;
+            updateSoundIcon(false);
+        });
+    }, 1000);
+}
+
+// 사운드 토글 함수
+function toggleSound() {
+    const music = document.getElementById('backgroundMusic');
+
+    if (!music) return;
+
+    if (music.paused || music.muted) {
+        // 음악 재생
+        music.muted = false;
+        music.play().catch(function(error) {
+            console.log('음악 재생 실패:', error);
+        });
+        isMusicPlaying = true;
+        isFirstInteractionHandled = true;
+        updateSoundIcon(true);
+    } else {
+        // 음악 정지
+        music.pause();
+        isMusicPlaying = false;
+        updateSoundIcon(false);
+    }
+}
+
+// 오프닝 장면 애니메이션
+// 터치 유도 화면 초기화
+function initTouchPrompt() {
+    const touchPrompt = document.getElementById('touchPrompt');
+    if (!touchPrompt) {
+        // 터치 유도 화면이 없으면 바로 오프닝 애니메이션 시작
+        initOpeningScenes();
+        return;
+    }
+
+    // 터치 이벤트 리스너 추가
+    const handleTouch = () => {
+        if (touchPrompt.classList.contains('hide')) return;
+
+        // 터치 유도 화면 숨기기
+        touchPrompt.classList.add('hide');
+
+        // 바로 음악 재생
+        startMusicAfterTouch();
+
+        // 바로 오프닝 애니메이션 시작
+        initOpeningScenes();
+    };
+
+    touchPrompt.addEventListener('click', handleTouch);
+    touchPrompt.addEventListener('touchstart', handleTouch);
+}
+
+// 터치 후 음악 재생
+function startMusicAfterTouch() {
+    const music = document.getElementById('backgroundMusic');
+    if (!music) return;
+
+    // 음악이 이미 재생 중이면 중단하고 다시 시작
+    if (!music.paused) {
+        music.pause();
+        music.currentTime = 0;
+    }
+
+    // 음소거 해제
+    music.muted = false;
+
+    // 음악 재생 시도
+    const playPromise = music.play();
+
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            isMusicPlaying = true;
+            updateSoundIcon(true);
+        }).catch((error) => {
+            console.log('음악 재생 실패:', error);
+            // 재생 실패 시 다시 시도
+            setTimeout(() => {
+                music.play().then(() => {
+                    isMusicPlaying = true;
+                    updateSoundIcon(true);
+                }).catch(() => {
+                    isMusicPlaying = false;
+                    updateSoundIcon(false);
+                });
+            }, 100);
+        });
+    } else {
+        // Promise를 지원하지 않는 브라우저
+        isMusicPlaying = !music.paused;
+        updateSoundIcon(isMusicPlaying);
+    }
+}
+
+function initOpeningScenes() {
+    const opening = document.getElementById('opening');
+    const scenes = opening ? Array.from(opening.querySelectorAll('.scene')) : [];
+    if (!opening || scenes.length === 0) {
+        return;
+    }
+
+    const DELAY_START = 200;
+    const HOLD = 2500;
+    const TRANSITION = 900;
+    const END_GAP = 400;
+    const FADE_DURATION = 900;
+
+    scenes.forEach(scene => scene.classList.remove('show', 'hide'));
+
+    const playScene = (index, delay) => {
+        if (!scenes[index]) {
+            setTimeout(() => {
+                opening.classList.add('fade-out');
+                setTimeout(() => {
+                    opening.style.display = 'none';
+                }, FADE_DURATION);
+            }, END_GAP);
+            return;
+        }
+
+        setTimeout(() => {
+            const currentScene = scenes[index];
+            currentScene.classList.add('show');
+
+            setTimeout(() => {
+                currentScene.classList.remove('show');
+                currentScene.classList.add('hide');
+            }, HOLD);
+
+            setTimeout(() => {
+                currentScene.classList.remove('hide');
+                playScene(index + 1, 0);
+            }, HOLD + TRANSITION);
+        }, delay);
+    };
+
+    playScene(0, DELAY_START);
+}
+
+// 갤러리 초기화
+function initGallery() {
+    // 초기에는 4개만 보이도록 설정 (이미 HTML에서 gallery-item-hidden 클래스가 적용되어 있음)
+    // 추가로 display 스타일도 설정
+    const hiddenItems = document.querySelectorAll('.gallery-item-hidden');
+    hiddenItems.forEach(item => {
+        item.style.display = 'none';
+    });
+}
+
+// 갤러리 더보기
+function showMoreGallery() {
+    const hiddenItems = document.querySelectorAll('.gallery-item-hidden');
+    const moreBtn = document.getElementById('galleryMoreBtn');
+    const fadeOverlay = document.getElementById('galleryFadeOverlay');
+
+    // expanded 클래스로 상태 확인
+    const isExpanded = moreBtn && moreBtn.classList.contains('expanded');
+
+    if (!isExpanded) {
+        // 숨겨진 항목들 표시 (더보기 → 접기)
+        hiddenItems.forEach(item => {
+            item.classList.remove('gallery-item-hidden');
+            item.style.display = '';
+        });
+        if (moreBtn) {
+            moreBtn.innerHTML = '접기 <img src="images/arrow.svg" alt="접기" class="gallery-more-arrow">';
+            moreBtn.classList.add('expanded');
+        }
+        // 그라데이션 오버레이 숨기기
+        if (fadeOverlay) {
+            fadeOverlay.classList.add('hidden');
+        }
+    } else {
+        // 다시 숨기기 (접기 → 더보기)
+        const allItems = document.querySelectorAll('.gallery-item');
+        allItems.forEach((item, index) => {
+            if (index >= 4) { // 5번째부터 (0-based index 4)
+                item.classList.add('gallery-item-hidden');
+                item.style.display = 'none';
+            }
+        });
+        if (moreBtn) {
+            moreBtn.innerHTML = '더보기 <img src="images/arrowdown.svg" alt="더보기" class="gallery-more-arrow">';
+            moreBtn.classList.remove('expanded');
+        }
+        // 그라데이션 오버레이 다시 표시
+        if (fadeOverlay) {
+            fadeOverlay.classList.remove('hidden');
+        }
+    }
+}
 
 // 스크롤 애니메이션
 function initScrollAnimation() {
     const sections = document.querySelectorAll('section');
+    const greetingContent = document.querySelector('.greeting-content');
 
+    // greeting-content 스크롤 애니메이션
+    if (greetingContent) {
+        const greetingObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.2,
+            rootMargin: '0px 0px -100px 0px'
+        });
+
+        greetingObserver.observe(greetingContent);
+    }
+
+    // 다른 섹션들 스크롤 애니메이션
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -37,11 +344,205 @@ function openModal(index) {
     const modal = document.getElementById('imageModal');
     const modalImg = document.getElementById('modalImage');
 
-    // 실제 이미지가 있다면 src를 변경하세요
-    // modalImg.src = `images/photo${index + 1}.jpg`;
+    if (galleryImages && galleryImages[index]) {
+        modalImg.src = galleryImages[index];
+    }
 
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
+
+    // 모바일 이미지 확대 방지
+    preventImageZoom(modal);
+
+    // 이미지 캡처 방지
+    preventImageCapture(modal, modalImg);
+}
+
+// 모바일 이미지 확대 방지 함수
+function preventImageZoom(modal) {
+    let lastTouchEnd = 0;
+
+    // 더블탭 줌 방지
+    modal.addEventListener('touchend', function(event) {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+
+    // 핀치 줌 방지
+    modal.addEventListener('touchmove', function(event) {
+        if (event.touches.length > 1) {
+            event.preventDefault();
+        }
+    }, { passive: false });
+
+    // 이미지 드래그 방지
+    const modalImg = document.getElementById('modalImage');
+    if (modalImg) {
+        modalImg.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        modalImg.addEventListener('gesturestart', function(event) {
+            event.preventDefault();
+        });
+
+        modalImg.addEventListener('gesturechange', function(event) {
+            event.preventDefault();
+        });
+
+        modalImg.addEventListener('gestureend', function(event) {
+            event.preventDefault();
+        });
+    }
+}
+
+// 이미지 캡처 방지 함수
+function preventImageCapture(modal, modalImg) {
+    // 우클릭 방지
+    modal.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+        return false;
+    }, false);
+
+    // 이미지 우클릭 방지
+    if (modalImg) {
+        modalImg.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+            return false;
+        }, false);
+
+        // 이미지 드래그 방지
+        modalImg.addEventListener('dragstart', function(event) {
+            event.preventDefault();
+            return false;
+        }, false);
+
+        // 이미지 선택 방지
+        modalImg.addEventListener('selectstart', function(event) {
+            event.preventDefault();
+            return false;
+        }, false);
+
+        // 이미지 복사 방지
+        modalImg.addEventListener('copy', function(event) {
+            event.preventDefault();
+            return false;
+        }, false);
+    }
+
+    // 키보드 단축키 방지 (F12, Ctrl+S, Ctrl+P 등)
+    modal.addEventListener('keydown', function(event) {
+        // F12 (개발자 도구)
+        if (event.key === 'F12') {
+            event.preventDefault();
+            return false;
+        }
+        // Ctrl+S (저장)
+        if (event.ctrlKey && event.key === 's') {
+            event.preventDefault();
+            return false;
+        }
+        // Ctrl+P (인쇄)
+        if (event.ctrlKey && event.key === 'p') {
+            event.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+I (개발자 도구)
+        if (event.ctrlKey && event.shiftKey && event.key === 'I') {
+            event.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+C (요소 검사)
+        if (event.ctrlKey && event.shiftKey && event.key === 'C') {
+            event.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+J (콘솔)
+        if (event.ctrlKey && event.shiftKey && event.key === 'J') {
+            event.preventDefault();
+            return false;
+        }
+        // Ctrl+U (소스 보기)
+        if (event.ctrlKey && event.key === 'u') {
+            event.preventDefault();
+            return false;
+        }
+    }, false);
+
+    // 탭 전환 감지 (다른 앱으로 전환 시 모달 닫기 및 이미지 숨기기)
+    const handleVisibilityChange = function() {
+        if (document.hidden) {
+            // 즉시 이미지를 숨기거나 블러 처리
+            if (modalImg) {
+                modalImg.style.opacity = '0';
+                modalImg.style.filter = 'blur(20px)';
+            }
+            // 짧은 지연 후 모달 닫기
+            setTimeout(function() {
+                closeModal();
+            }, 100);
+        } else {
+            // 다시 보일 때 이미지 복원
+            if (modalImg) {
+                modalImg.style.opacity = '1';
+                modalImg.style.filter = 'none';
+            }
+        }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // 창 포커스 잃음 감지 (모바일에서 앱 전환 시)
+    const handleBlur = function() {
+        if (modalImg) {
+            modalImg.style.opacity = '0';
+            modalImg.style.filter = 'blur(20px)';
+        }
+        setTimeout(function() {
+            closeModal();
+        }, 100);
+    };
+    window.addEventListener('blur', handleBlur);
+
+    // 페이지 언로드 시 이미지 숨기기
+    const handleBeforeUnload = function() {
+        if (modalImg) {
+            modalImg.style.opacity = '0';
+            modalImg.style.filter = 'blur(20px)';
+        }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // 페이지 숨김 감지 (iOS Safari 등)
+    const handlePageHide = function() {
+        if (modalImg) {
+            modalImg.style.opacity = '0';
+            modalImg.style.filter = 'blur(20px)';
+        }
+        closeModal();
+    };
+    window.addEventListener('pagehide', handlePageHide);
+
+    // 개발자 도구 감지 시도 (간단한 방법)
+    let devtools = {open: false, orientation: null};
+    const threshold = 160;
+    setInterval(function() {
+        if (window.outerHeight - window.innerHeight > threshold ||
+            window.outerWidth - window.innerWidth > threshold) {
+            if (!devtools.open) {
+                devtools.open = true;
+                closeModal();
+            }
+        } else {
+            if (devtools.open) {
+                devtools.open = false;
+            }
+        }
+    }, 500);
 }
 
 function closeModal() {
@@ -60,7 +561,9 @@ function changeImage(direction) {
     }
 
     const modalImg = document.getElementById('modalImage');
-    // modalImg.src = `images/photo${currentImageIndex + 1}.jpg`;
+    if (galleryImages && galleryImages[currentImageIndex]) {
+        modalImg.src = galleryImages[currentImageIndex];
+    }
 }
 
 // ESC 키로 모달 닫기
@@ -72,37 +575,96 @@ document.addEventListener('keydown', function(event) {
 
 // 지도 앱 열기
 function openKakaoMap() {
-    // 실제 장소 좌표로 변경하세요
+    // 실제 장소명으로 변경하세요
     const placeName = '예식장 이름';
     const url = `https://map.kakao.com/link/search/${encodeURIComponent(placeName)}`;
     window.open(url, '_blank');
 }
 
 function openNaverMap() {
-    // 실제 장소 좌표로 변경하세요
+    // 예식장 정보로 변경하세요
     const placeName = '예식장 이름';
+    const address = '예식장 주소';
     const url = `https://map.naver.com/v5/search/${encodeURIComponent(placeName)}`;
     window.open(url, '_blank');
 }
 
 function openTmap() {
-    // 실제 장소 좌표로 변경하세요
+    // 구글 지도로 변경 (티맵 대체)
     const placeName = '예식장 이름';
-    const url = `https://apis.openapi.sk.com/tmap/app/routes?appKey=YOUR_APP_KEY&name=${encodeURIComponent(placeName)}`;
-    window.open(url, '_blank');
+    const address = '예식장 주소';
+
+    // 구글 지도 검색 URL (모바일/PC 모두 작동)
+    const googleMapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`;
+    window.open(googleMapUrl, '_blank');
+}
+
+function openKakaoNavi() {
+    // 예식장 좌표로 변경하세요 (카카오맵에서 좌표 검색)
+    const placeName = '예식장 이름';
+    const latitude = 37.5665;  // 위도 (예: 서울시청)
+    const longitude = 126.9780; // 경도
+    // 카카오내비 앱 스킴 (좌표로 목적지 설정)
+    const kakaoNaviUrl = `kakaomap://route?ep=${latitude},${longitude}&by=CAR`;
+
+    // 앱 스킴 시도
+    window.location.href = kakaoNaviUrl;
+
+    // 1초 후 앱이 안 열리면 카카오맵 웹으로 폴백
+    setTimeout(() => {
+        window.open(`https://map.kakao.com/link/to/${encodeURIComponent(placeName)},${latitude},${longitude}`, '_blank');
+    }, 1000);
+}
+
+function viewMapImage() {
+    // 약도 이미지를 모달로 표시
+    const mapImagePath = 'images/map-guide.jpg'; // 약도 이미지 경로
+
+    // 이미지 존재 확인을 위해 시도
+    const img = new Image();
+    img.onload = function() {
+        // 이미지가 존재하면 갤러리 모달 활용
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+
+        modalImg.src = mapImagePath;
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    };
+    img.onerror = function() {
+        // 이미지가 없으면 토스트 메시지
+        showToast('약도 이미지를 준비 중입니다');
+    };
+    img.src = mapImagePath;
+}
+
+// 계좌 섹션 토글
+function toggleAccountSection(type) {
+    const content = document.getElementById(type + 'Content');
+    const arrow = document.getElementById(type + 'Arrow');
+
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        arrow.classList.add('open');
+    } else {
+        content.style.display = 'none';
+        arrow.classList.remove('open');
+    }
 }
 
 // 계좌번호 복사
-function copyAccount(accountNumber) {
+function copyAccount(bankName, accountNumber) {
+    const accountInfo = `${bankName} ${accountNumber}`;
+
     if (navigator.clipboard) {
-        navigator.clipboard.writeText(accountNumber).then(() => {
-            showToast('계좌번호가 복사되었습니다');
+        navigator.clipboard.writeText(accountInfo).then(() => {
+            showToast('계좌정보가 복사되었습니다');
         }).catch(err => {
             console.error('복사 실패:', err);
-            fallbackCopy(accountNumber);
+            fallbackCopy(accountInfo);
         });
     } else {
-        fallbackCopy(accountNumber);
+        fallbackCopy(accountInfo);
     }
 }
 
@@ -117,7 +679,7 @@ function fallbackCopy(text) {
 
     try {
         document.execCommand('copy');
-        showToast('계좌번호가 복사되었습니다');
+        showToast('계좌정보가 복사되었습니다');
     } catch (err) {
         showToast('복사에 실패했습니다');
     }
@@ -125,16 +687,99 @@ function fallbackCopy(text) {
     document.body.removeChild(textArea);
 }
 
-// 방명록 메시지 저장 및 불러오기
-function submitMessage() {
+// 카카오페이 송금하기
+function sendKakaoPay(bankName, accountNumber, accountHolder) {
+    // 계좌정보 복사
+    const accountInfo = `${bankName} ${accountNumber}`;
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(accountInfo).then(() => {
+            showToast('계좌정보가 복사되었습니다');
+        }).catch(err => {
+            console.error('복사 실패:', err);
+        });
+    }
+
+    // 카카오페이 앱 실행
+    // 카카오톡 > 더보기 > Pay > 송금 화면으로 이동
+    const kakaoPayUrl = 'kakaotalk://kakaopay/home';
+
+    // 앱 실행 시도
+    const appOpenAttempt = window.open(kakaoPayUrl, '_self');
+
+    // 앱이 안 열릴 경우 대비
+    setTimeout(() => {
+        if (!document.hidden) {
+            // 앱이 실행되지 않은 경우
+            if (confirm(`${accountInfo}\n${accountHolder}\n\n계좌정보가 복사되었습니다.\n카카오페이를 실행하시겠습니까?`)) {
+                // 카카오톡 실행 (카카오페이는 카카오톡 안에 있음)
+                window.location.href = 'kakaotalk://';
+            }
+        }
+    }, 500);
+}
+
+// 방명록 관련 함수
+function focusGuestbook() {
+    showGuestbookForm();
+}
+
+function showGuestbookForm() {
+    const form = document.getElementById('guestbookForm');
+    const submitButton = document.getElementById('guestbookSubmitBtn');
+
+    if (form) {
+        const isHidden = form.style.display === 'none';
+        form.style.display = isHidden ? 'block' : 'none';
+
+        // 새로 작성할 때는 수정 모드 해제 및 버튼 텍스트 원래대로
+        if (isHidden) {
+            editingMessageId = null;
+            if (submitButton) {
+                submitButton.textContent = '메시지 남기기';
+            }
+            // 입력 필드 초기화
+            const nameInput = document.getElementById('guestName');
+            const passwordInput = document.getElementById('guestPassword');
+            const messageInput = document.getElementById('guestMessage');
+            if (nameInput) nameInput.value = '';
+            if (passwordInput) passwordInput.value = '';
+            if (messageInput) messageInput.value = '';
+        }
+    }
+}
+
+function closeGuestbookForm() {
+    const form = document.getElementById('guestbookForm');
+    const submitButton = document.getElementById('guestbookSubmitBtn');
+
+    if (form) {
+        form.style.display = 'none';
+    }
+    if (submitButton) {
+        submitButton.textContent = '메시지 남기기';
+    }
+    editingMessageId = null;
+}
+
+
+// 방명록 메시지 저장 및 불러오기 (Firebase)
+async function submitMessage() {
     const nameInput = document.getElementById('guestName');
+    const passwordInput = document.getElementById('guestPassword');
     const messageInput = document.getElementById('guestMessage');
 
     const name = nameInput.value.trim();
+    const password = passwordInput.value.trim();
     const message = messageInput.value.trim();
 
     if (!name) {
         showToast('이름을 입력해주세요');
+        return;
+    }
+
+    if (!password) {
+        showToast('비밀번호를 입력해주세요');
         return;
     }
 
@@ -143,50 +788,242 @@ function submitMessage() {
         return;
     }
 
-    const messageData = {
-        name: name,
-        message: message,
-        date: new Date().toISOString()
-    };
+    const { collection, addDoc, updateDoc, doc } = window.firestoreModules;
 
-    // 로컬 스토리지에 저장
-    let messages = JSON.parse(localStorage.getItem('weddingMessages') || '[]');
-    messages.unshift(messageData);
-    localStorage.setItem('weddingMessages', JSON.stringify(messages));
+    try {
+        // 수정 모드인 경우
+        if (editingMessageId !== null) {
+            const messageRef = doc(window.db, 'guestbook', editingMessageId);
+            await updateDoc(messageRef, {
+                name: name,
+                password: password,
+                message: message
+            });
+            editingMessageId = null;
+            showToast('메시지가 수정되었습니다');
+        } else {
+            // 새 메시지 작성
+            const messageData = {
+                name: name,
+                password: password,
+                message: message,
+                date: new Date().toISOString()
+            };
+            await addDoc(collection(window.db, 'guestbook'), messageData);
+            showToast('메시지가 등록되었습니다');
+        }
 
-    // 입력 필드 초기화
-    nameInput.value = '';
-    messageInput.value = '';
+        // 입력 필드 초기화
+        nameInput.value = '';
+        passwordInput.value = '';
+        messageInput.value = '';
 
-    // 메시지 목록 새로고침
-    loadMessages();
-
-    showToast('메시지가 등록되었습니다');
+        // 폼 숨기기 및 버튼 텍스트 원래대로
+        const form = document.getElementById('guestbookForm');
+        const submitButton = document.getElementById('guestbookSubmitBtn');
+        if (form) {
+            form.style.display = 'none';
+        }
+        if (submitButton) {
+            submitButton.textContent = '메시지 남기기';
+        }
+        editingMessageId = null;
+    } catch (error) {
+        console.error('메시지 저장 오류:', error);
+        showToast('메시지 저장에 실패했습니다');
+    }
 }
 
+// Firebase에서 실시간으로 메시지 불러오기
 function loadMessages() {
+    const { collection, query, orderBy, onSnapshot } = window.firestoreModules;
     const messageList = document.getElementById('messageList');
-    const messages = JSON.parse(localStorage.getItem('weddingMessages') || '[]');
+    const moreContainer = document.getElementById('guestbookMoreContainer');
+    const emptyBox = document.getElementById('guestbookEmptyBox');
 
-    if (messages.length === 0) {
-        messageList.innerHTML = '<p style="text-align: center; color: #999;">아직 메시지가 없습니다</p>';
+    if (!window.db) {
+        console.error('Firebase가 초기화되지 않았습니다');
         return;
     }
 
-    messageList.innerHTML = messages.map(msg => {
-        const date = new Date(msg.date);
-        const dateStr = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+    // 실시간 리스너 설정 (날짜 내림차순)
+    const q = query(collection(window.db, 'guestbook'), orderBy('date', 'desc'));
 
-        return `
-            <div class="message-item">
-                <div class="message-header">
-                    <span class="message-author">${escapeHtml(msg.name)}</span>
-                    <span class="message-date">${dateStr}</span>
+    onSnapshot(q, (snapshot) => {
+        window.allMessages = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        const messages = window.allMessages;
+
+        if (messages.length === 0) {
+            messageList.innerHTML = '';
+            if (moreContainer) {
+                moreContainer.style.display = 'none';
+            }
+            if (emptyBox) {
+                emptyBox.style.display = 'flex';
+            }
+            return;
+        }
+
+        if (emptyBox) {
+            emptyBox.style.display = 'none';
+        }
+
+        // 표시할 메시지 개수 결정
+        const messagesToShow = messages.slice(0, displayedMessageCount);
+        const hasMore = messages.length > displayedMessageCount;
+
+        messageList.innerHTML = messagesToShow.map((msg) => {
+            const date = new Date(msg.date);
+            const dateStr = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+            const messageContent = escapeHtml(msg.message);
+            const name = escapeHtml(msg.name);
+
+            return `
+                <div class="message-item">
+                    <div class="message-top">
+                        <span class="message-name">${name}</span>
+                        <div class="message-buttons">
+                            <span class="message-edit" onclick="editMessage('${msg.id}')">✎</span>
+                            <span class="message-close" onclick="deleteMessage('${msg.id}')">×</span>
+                        </div>
+                    </div>
+                    <div class="message-content">${messageContent}</div>
                 </div>
-                <div class="message-content">${escapeHtml(msg.message)}</div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
+
+        // 더보기/접기 버튼 표시/숨김
+        if (moreContainer) {
+            const moreBtn = document.getElementById('guestbookMoreBtn');
+            if (hasMore || displayedMessageCount >= messages.length) {
+                moreContainer.style.display = 'block';
+                if (moreBtn) {
+                    if (displayedMessageCount >= messages.length && messages.length > 3) {
+                        moreBtn.innerHTML = '접기 <img src="images/arrow.svg" alt="접기" class="guestbook-more-arrow">';
+                        moreBtn.classList.add('expanded');
+                    } else {
+                        moreBtn.innerHTML = '더보기 <img src="images/arrowdown.svg" alt="더보기" class="guestbook-more-arrow">';
+                        moreBtn.classList.remove('expanded');
+                    }
+                }
+            } else {
+                moreContainer.style.display = 'none';
+            }
+        }
+    });
+}
+
+// 더보기 기능
+function showMoreMessages() {
+    const messages = window.allMessages || [];
+    const moreBtn = document.getElementById('guestbookMoreBtn');
+
+    // 현재 모든 메시지가 표시되고 있는지 확인
+    if (displayedMessageCount >= messages.length) {
+        // 접기: 다시 3개만 표시
+        displayedMessageCount = 3;
+        if (moreBtn) {
+            moreBtn.innerHTML = '더보기 <img src="images/arrowdown.svg" alt="더보기" class="guestbook-more-arrow">';
+            moreBtn.classList.remove('expanded');
+        }
+    } else {
+        // 더보기: 모든 메시지 표시
+        displayedMessageCount = messages.length;
+        if (moreBtn) {
+            moreBtn.innerHTML = '접기 <img src="images/arrow.svg" alt="접기" class="guestbook-more-arrow">';
+            moreBtn.classList.add('expanded');
+        }
+    }
+
+    // 다시 렌더링 (onSnapshot이 자동으로 처리하지만 즉시 반영을 위해)
+    loadMessages();
+}
+
+// 방명록 삭제 (Firebase)
+async function deleteMessage(messageId) {
+    const messages = window.allMessages || [];
+    const message = messages.find(m => m.id === messageId);
+
+    if (!message) {
+        showToast('메시지를 찾을 수 없습니다');
+        return;
+    }
+
+    // 비밀번호 확인
+    const password = prompt('비밀번호를 입력해주세요:');
+
+    if (password === null) {
+        return;
+    }
+
+    if (password !== message.password) {
+        showToast('비밀번호가 일치하지 않습니다');
+        return;
+    }
+
+    // 비밀번호가 맞으면 삭제
+    const { deleteDoc, doc } = window.firestoreModules;
+
+    try {
+        await deleteDoc(doc(window.db, 'guestbook', messageId));
+        showToast('메시지가 삭제되었습니다');
+    } catch (error) {
+        console.error('삭제 오류:', error);
+        showToast('메시지 삭제에 실패했습니다');
+    }
+}
+
+// 방명록 수정 (Firebase)
+function editMessage(messageId) {
+    const messages = window.allMessages || [];
+    const message = messages.find(m => m.id === messageId);
+
+    if (!message) {
+        showToast('메시지를 찾을 수 없습니다');
+        return;
+    }
+
+    // 비밀번호 확인
+    const password = prompt('비밀번호를 입력해주세요:');
+
+    if (password === null) {
+        return;
+    }
+
+    if (password !== message.password) {
+        showToast('비밀번호가 일치하지 않습니다');
+        return;
+    }
+
+    // 비밀번호가 맞으면 수정 폼 표시
+    const nameInput = document.getElementById('guestName');
+    const passwordInput = document.getElementById('guestPassword');
+    const messageInput = document.getElementById('guestMessage');
+    const form = document.getElementById('guestbookForm');
+        const submitButton = document.getElementById('guestbookSubmitBtn');
+
+    if (nameInput && passwordInput && messageInput && form) {
+        nameInput.value = message.name;
+        passwordInput.value = message.password;
+        messageInput.value = message.message;
+
+        // 수정 모드로 설정 (messageId 저장)
+        editingMessageId = messageId;
+
+        // 버튼 텍스트 변경
+        if (submitButton) {
+            submitButton.textContent = '메시지 수정하기';
+        }
+
+        form.style.display = 'block';
+
+        // 폼이 보이도록 스크롤
+        form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 }
 
 // XSS 방지를 위한 HTML 이스케이프
@@ -196,60 +1033,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// 카카오톡 공유
-function shareKakao() {
-    // 카카오 SDK를 초기화하고 사용하려면 카카오 개발자 앱 키가 필요합니다
-    // https://developers.kakao.com/ 에서 앱을 생성하고 JavaScript 키를 받으세요
-
-    if (typeof Kakao === 'undefined') {
-        showToast('카카오톡 공유 기능을 준비 중입니다');
-        return;
-    }
-
-    Kakao.Share.sendDefault({
-        objectType: 'feed',
-        content: {
-            title: '우리 결혼합니다',
-            description: '소중한 분들을 초대합니다',
-            imageUrl: window.location.origin + '/path/to/image.jpg',
-            link: {
-                mobileWebUrl: window.location.href,
-                webUrl: window.location.href
-            }
-        },
-        buttons: [
-            {
-                title: '청첩장 보기',
-                link: {
-                    mobileWebUrl: window.location.href,
-                    webUrl: window.location.href
-                }
-            }
-        ]
-    });
-}
-
-// 페이스북 공유
-function shareFacebook() {
-    const url = encodeURIComponent(window.location.href);
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-}
-
-// URL 복사
-function copyURL() {
-    const url = window.location.href;
-
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(() => {
-            showToast('URL이 복사되었습니다');
-        }).catch(err => {
-            console.error('복사 실패:', err);
-            fallbackCopy(url);
-        });
-    } else {
-        fallbackCopy(url);
-    }
-}
 
 // 토스트 메시지 표시
 function showToast(message) {
@@ -327,11 +1110,229 @@ function handleSwipe() {
 
 // 이미지 프리로드 (성능 향상)
 function preloadImages() {
-    for (let i = 1; i <= totalImages; i++) {
-        const img = new Image();
-        // img.src = `images/photo${i}.jpg`;
+    if (galleryImages) {
+        galleryImages.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
     }
 }
 
 // 페이지 로드 완료 후 이미지 프리로드
 window.addEventListener('load', preloadImages);
+
+// 사진 업로드 - 구글 폼으로 이동
+function openPhotoForm() {
+    // 구글 폼 또는 Jotform URL을 입력하세요
+    const googleFormUrl = 'YOUR_GOOGLE_FORM_OR_JOTFORM_URL';
+    window.open(googleFormUrl, '_blank');
+}
+
+// 달력 생성 - 여기서 결혼식 날짜를 변경하세요
+function initCalendar() {
+    const calendarGrid = document.getElementById('calendarGrid');
+    if (!calendarGrid) return;
+
+    // ⭐ 결혼식 날짜 설정 (여기를 변경하세요!)
+    const year = 2025;  // 결혼식 년도
+    const month = 0; // 결혼식 월 (0=1월, 1=2월, ..., 11=12월)
+    const weddingDay = 1;  // 결혼식 일
+
+    // 해당 월의 첫 번째 날짜
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDay = firstDay.getDay(); // 0(일요일) ~ 6(토요일)
+    const daysInMonth = lastDay.getDate();
+
+    // 이전 달의 마지막 날짜들
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+    calendarGrid.innerHTML = '';
+
+    // 이전 달의 날짜들 (빈 칸 채우기)
+    for (let i = startDay - 1; i >= 0; i--) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day other-month';
+        day.textContent = prevMonthLastDay - i;
+        calendarGrid.appendChild(day);
+    }
+
+    // 현재 달의 날짜들
+    for (let date = 1; date <= daysInMonth; date++) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day';
+        if (date === weddingDay) {
+            day.classList.add('wedding-day');
+        }
+        day.textContent = date;
+        calendarGrid.appendChild(day);
+    }
+
+    // 다음 달의 날짜들 (달력 완성)
+    const totalCells = calendarGrid.children.length;
+    const remainingCells = 42 - totalCells; // 6주 * 7일 = 42
+    for (let date = 1; date <= remainingCells; date++) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day other-month';
+        day.textContent = date;
+        calendarGrid.appendChild(day);
+    }
+}
+
+// 카운트다운 타이머 - 여기서 결혼식 날짜와 시간을 변경하세요
+function initCountdown() {
+    const countdownDays = document.getElementById('countdownDays');
+    const countdownHours = document.getElementById('countdownHours');
+    const countdownMinutes = document.getElementById('countdownMinutes');
+    const countdownSeconds = document.getElementById('countdownSeconds');
+    const weddingDayCount = document.getElementById('weddingDayCount');
+
+    if (!countdownDays || !countdownHours || !countdownMinutes || !countdownSeconds) return;
+
+    // ⭐ 결혼식 날짜와 시간 설정 (여기를 변경하세요!)
+    const weddingDate = new Date('2025-01-01T12:00:00');
+
+    function updateCountdown() {
+        const now = new Date();
+        const diff = weddingDate - now;
+
+        if (diff <= 0) {
+            countdownDays.textContent = '00';
+            countdownHours.textContent = '00';
+            countdownMinutes.textContent = '00';
+            countdownSeconds.textContent = '00';
+            if (weddingDayCount) {
+                weddingDayCount.textContent = '1';
+            }
+            return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        countdownDays.textContent = String(days).padStart(2, '0');
+        countdownHours.textContent = String(hours).padStart(2, '0');
+        countdownMinutes.textContent = String(minutes).padStart(2, '0');
+        countdownSeconds.textContent = String(seconds).padStart(2, '0');
+
+        // 날짜 메시지 업데이트
+        if (weddingDayCount) {
+            weddingDayCount.textContent = days + 1;
+        }
+    }
+
+    // 즉시 업데이트
+    updateCountdown();
+
+    // 1초마다 업데이트
+    setInterval(updateCountdown, 1000);
+}
+
+// 네이버 지도 초기화 - 여기서 예식장 좌표를 변경하세요
+function initNaverMap() {
+    // 네이버 지도 API가 로드되었는지 확인
+    if (typeof naver === 'undefined') {
+        console.error('네이버 지도 API가 로드되지 않았습니다.');
+        return;
+    }
+
+    const mapElement = document.getElementById('map');
+    if (!mapElement) {
+        console.error('지도 요소를 찾을 수 없습니다.');
+        return;
+    }
+
+    // ⭐ 예식장 좌표 설정 (여기를 변경하세요!)
+    // 좌표 찾는 법: 네이버 지도에서 예식장 검색 → 주소 복사 → "좌표 변환" 검색
+    const weddingLocation = new naver.maps.LatLng(37.5665, 126.9780);  // 예: 서울시청
+
+    // 지도 옵션
+    const mapOptions = {
+        center: weddingLocation,
+        zoom: 16,
+        zoomControl: true,
+        zoomControlOptions: {
+            position: naver.maps.Position.TOP_RIGHT
+        }
+    };
+
+    // 지도 생성
+    const map = new naver.maps.Map('map', mapOptions);
+
+    // 마커 생성
+    const marker = new naver.maps.Marker({
+        position: weddingLocation,
+        map: map,
+        title: '예식장 이름'  // ⭐ 예식장 이름 변경
+    });
+
+    // 정보창 내용
+    const contentString = [
+        '<div style="padding:10px;min-width:200px;line-height:1.5;">',
+        '   <h4 style="margin:0 0 10px 0;font-size:16px;font-weight:bold;">예식장 이름</h4>',  // ⭐ 변경
+        '   <p style="margin:0;font-size:13px;color:#666;">예식장 주소</p>',  // ⭐ 변경
+        '   <p style="margin:5px 0 0 0;font-size:13px;color:#666;">Tel. 000-0000-0000</p>',  // ⭐ 변경
+        '</div>'
+    ].join('');
+
+    // 정보창 생성
+    const infowindow = new naver.maps.InfoWindow({
+        content: contentString
+    });
+
+    // 마커 클릭 시 정보창 표시
+    naver.maps.Event.addListener(marker, 'click', function() {
+        if (infowindow.getMap()) {
+            infowindow.close();
+        } else {
+            infowindow.open(map, marker);
+        }
+    });
+
+    // 기본으로 정보창 열어두기
+    infowindow.open(map, marker);
+}
+
+// ============================================
+// 카카오톡 공유하기 - 여기서 정보를 변경하세요
+// ============================================
+
+// Kakao SDK 초기화
+if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
+    // ⭐ Kakao JavaScript 키 입력 (https://developers.kakao.com)
+    Kakao.init('YOUR_KAKAO_JAVASCRIPT_KEY');
+    console.log('Kakao SDK 초기화 완료:', Kakao.isInitialized());
+}
+
+// 카카오톡 공유하기 함수
+function shareKakao() {
+    if (typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
+        showToast('카카오톡 공유 기능을 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
+
+    Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+            // ⭐ 공유 메시지 내용 변경
+            title: '신랑 ♡ 신부 결혼식에 초대합니다.',
+            description: '0000년 00월 00일 0요일 오전 00시 \n예식장 이름',
+            imageUrl: 'YOUR_THUMBNAIL_IMAGE_URL',  // ⭐ 썸네일 이미지 URL
+            link: {
+                mobileWebUrl: 'YOUR_WEDDING_WEBSITE_URL',  // ⭐ 청첩장 URL
+                webUrl: 'YOUR_WEDDING_WEBSITE_URL',
+            },
+        },
+        buttons: [
+            {
+                title: '모바일 청첩장 보기',
+                link: {
+                    mobileWebUrl: 'YOUR_WEDDING_WEBSITE_URL',  // ⭐ 청첩장 URL
+                    webUrl: 'YOUR_WEDDING_WEBSITE_URL',
+                },
+            },
+        ],
+    });
+}
