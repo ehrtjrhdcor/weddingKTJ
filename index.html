@@ -46,37 +46,7 @@
     </script>
 </head>
 <body>
-    <!-- theirmood 스타일 오프닝 레이어 -->
-    <div id="opening">
-        <div class="touch-prompt" id="touchPrompt">
-            <p>화면을 터치해주세요</p>
-        </div>
-        <div class="scene scene-1 scene--left">
-            <div class="scene-inner">
-                <img src="images/5.jpg" alt="scene1" class="scene-img">
-                <img src="images/애니문구1.svg" alt="문구" class="scene-text">
-            </div>
-        </div>
-        <div class="scene scene-2 scene--right">
-            <div class="scene-inner">
-                <img src="images/6.jpg" alt="scene2" class="scene-img">
-                <img src="images/애니문구2-1.svg" alt="문구1" class="scene-text scene-text--top">
-                <img src="images/애니문구2-2.svg" alt="문구2" class="scene-text scene-text--bottom">
-            </div>
-        </div>
-    </div>
-
     <main id="content">
-    <!-- 배경음악 -->
-    <audio id="backgroundMusic" loop muted>
-        <source src="weddingmusic.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- 사운드 토글 버튼 -->
-    <button class="sound-toggle-btn" id="soundToggleBtn" onclick="toggleSound()">
-        <img src="images/soundon.svg" alt="사운드 켜기" id="soundIcon">
-    </button>
-
     <!-- 메인 헤더 -->
     <section class="hero">
         <img src="images/메인이미지.svg" alt="Frame 3" class="frame-3-image">
@@ -351,28 +321,6 @@
             <input type="password" id="guestPassword" placeholder="비밀번호" maxlength="20">
             <textarea id="guestMessage" placeholder="축하 메시지를 남겨주세요" maxlength="200"></textarea>
             <button id="guestbookSubmitBtn" onclick="submitMessage()">메시지 남기기</button>
-        </div>
-    </section>
-
-    <!-- 스냅 섹션 -->
-    <section class="snap-section">
-        <div class="container">
-            <div class="snap-label">CAPTURE OUR MOMENTS</div>
-            <h2 class="snap-title">스냅</h2>
-
-            <div class="snap-instructions">
-                <p>신랑신부의 행복한 순간을 담아주세요.</p>
-                <p>예식 당일, 아래 버튼을 통해 사진을 올려주세요.</p>
-                <p>많은 참여 부탁드려요!</p>
-            </div>
-
-            <div class="snap-upload-section">
-                <button class="btn-upload-photo" onclick="openPhotoForm()">사진 업로드</button>
-                <div class="upload-availability">
-                    <p>0000-00-00 00:00부터</p>
-                    <p>업로드 가능합니다.</p>
-                </div>
-            </div>
         </div>
     </section>
 
