@@ -621,15 +621,16 @@ async function submitMessage() {
 
 // Firebase에서 실시간으로 메시지 불러오기
 function loadMessages() {
+    // Firebase가 로드되지 않았으면 조용히 종료
+    if (!window.db || !window.firestoreModules) {
+        console.log('Firebase 설정이 필요합니다. TODO.md 참고');
+        return;
+    }
+
     const { collection, query, orderBy, onSnapshot } = window.firestoreModules;
     const messageList = document.getElementById('messageList');
     const moreContainer = document.getElementById('guestbookMoreContainer');
     const emptyBox = document.getElementById('guestbookEmptyBox');
-
-    if (!window.db) {
-        console.error('Firebase가 초기화되지 않았습니다');
-        return;
-    }
 
     // 실시간 리스너 설정 (날짜 내림차순)
     const q = query(collection(window.db, 'guestbook'), orderBy('date', 'desc'));
