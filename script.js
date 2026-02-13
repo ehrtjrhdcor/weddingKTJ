@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initCalendar();
     initCountdown();
     initGallery();
-    // initNaverMap(); // 현재 구글 지도 사용 중
+    initNaverMap(); // 네이버 지도 활성화
 
     // 비밀번호 입력창 Enter 키 이벤트
     const passwordInput = document.getElementById('passwordInput');
