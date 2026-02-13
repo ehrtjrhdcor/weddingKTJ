@@ -613,8 +613,8 @@ function openGoogleMap() {
 
 function openTmap() {
     const placeName = '신도림 라마다 호텔';
-    const latitude = 37.5084;  // 위도
-    const longitude = 126.8909; // 경도
+    const latitude = 37.508429;  // 위도
+    const longitude = 126.890891; // 경도
 
     // Tmap 앱 스킴
     const tmapUrl = `tmap://route?goalname=${encodeURIComponent(placeName)}&goalx=${longitude}&goaly=${latitude}`;
@@ -636,8 +636,8 @@ function openTmap() {
 
 function openKakaoNavi() {
     const placeName = '신도림 라마다 호텔';
-    const latitude = 37.5084;  // 위도
-    const longitude = 126.8909; // 경도
+    const latitude = 37.508429;  // 위도
+    const longitude = 126.890891; // 경도
     // 카카오내비 앱 스킴 (좌표로 목적지 설정)
     const kakaoNaviUrl = `kakaomap://route?ep=${latitude},${longitude}&by=CAR`;
 
