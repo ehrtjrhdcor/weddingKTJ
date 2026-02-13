@@ -46,7 +46,30 @@
     </script>
 </head>
 <body>
+    <!-- theirmood 스타일 오프닝 레이어 -->
+    <div id="opening">
+        <div class="touch-prompt" id="touchPrompt">
+            <p>화면을 터치해주세요</p>
+        </div>
+        <div class="scene scene-1 scene--left">
+            <div class="scene-inner">
+                <img src="images/IMG_0539.jpg" alt="scene1" class="scene-img">
+                <img src="images/애니문구1.svg" alt="문구" class="scene-text">
+            </div>
+        </div>
+    </div>
+
     <main id="content">
+    <!-- 배경음악 -->
+    <audio id="backgroundMusic" loop muted>
+        <source src="weddingmusic.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 사운드 토글 버튼 -->
+    <button class="sound-toggle-btn" id="soundToggleBtn" onclick="toggleSound()">
+        <img src="images/soundon.svg" alt="사운드 켜기" id="soundIcon">
+    </button>
+
     <!-- 메인 헤더 -->
     <section class="hero">
         <img src="images/IMG_0523_MAIN.jpg" alt="Frame 3" class="frame-3-image">

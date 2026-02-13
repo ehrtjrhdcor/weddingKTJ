@@ -1896,11 +1896,7 @@ h3.venue-name {
 
 
 .scene-1::before {
-    background-image: url("images/5.jpg");
-}
-
-.scene-2::before {
-    background-image: url("images/6.jpg");
+    background-image: url("images/IMG_0539.jpg");
 }
 
 .scene.show {
@@ -2115,5 +2111,259 @@ h3.venue-name {
     to {
         transform: translateY(0);
         opacity: 1;
+    }
+}
+
+/* ============================================
+   사운드 토글 버튼
+   ============================================ */
+.sound-toggle-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 10001;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+}
+
+.sound-toggle-btn:hover {
+    opacity: 0.7;
+}
+
+.sound-toggle-btn img {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ============================================
+   오프닝 애니메이션
+   ============================================ */
+#opening {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #f8f5f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: opacity 0.8s ease;
+}
+
+.touch-prompt {
+    position: absolute;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f5f3;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    pointer-events: auto;
+}
+
+.touch-prompt.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.touch-prompt p {
+    font-size: 18px;
+    font-weight: 500;
+    color: #666;
+    letter-spacing: 0.1em;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+#opening.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.scene {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0;
+    transform: translateY(15px);
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.scene-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 24px 48px;
+}
+
+.scene-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.scene-text {
+    position: relative;
+    z-index: 2;
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0;
+}
+
+.scene-1::before {
+    background-image: url("images/IMG_0539.jpg");
+}
+
+.scene.show {
+    animation: sceneFadeIn 1.8s ease forwards;
+}
+
+.scene.hide {
+    animation: sceneFadeOut 1.2s ease forwards;
+}
+
+.scene.show .scene-text {
+    animation: textFadeIn 1.8s ease forwards;
+    animation-delay: 0.35s;
+}
+
+.scene--left.show .scene-text {
+    animation: textLeftFlow 2s ease forwards;
+    animation-delay: 0.35s;
+}
+
+/* 두 번째 씬의 일반 텍스트 (scene-text--top, scene-text--bottom이 아닌 경우) */
+.scene--right.show > .scene-inner > .scene-text:not(.scene-text--top):not(.scene-text--bottom) {
+    animation: textRightFlow 2s ease forwards;
+    animation-delay: 0.35s;
+}
+
+/* 두 번째 씬 문구 이미지 */
+.scene-text--top,
+.scene-text--bottom {
+    max-width: 80%;
+    height: auto;
+}
+
+/* 위쪽 문구(애니문구2-1.svg): 왼쪽에서 오른쪽으로 */
+.scene--right.show .scene-text--top {
+    animation: textLeftToRight 2s ease forwards;
+    animation-delay: 0.35s;
+}
+
+/* 아래쪽 문구(애니문구2-2.svg): 오른쪽에서 왼쪽으로 */
+.scene--right.show .scene-text--bottom {
+    animation: textRightToLeft 2s ease forwards;
+    animation-delay: 0.5s;
+}
+
+@keyframes textLeftToRight {
+    0% {
+        opacity: 0;
+        transform: translateX(-70px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes textRightToLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(70px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.scene--left.show .scene-img,
+.scene--right.show .scene-img {
+    animation: none;
+}
+
+@keyframes sceneFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes sceneFadeOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-24px);
+    }
+}
+
+@keyframes textFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes textLeftFlow {
+    0% {
+        opacity: 0;
+        transform: translateX(-35px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes textRightFlow {
+    0% {
+        opacity: 0;
+        transform: translateX(35px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
