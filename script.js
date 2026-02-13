@@ -597,14 +597,14 @@ function openKakaoMap() {
 
 function openNaverMap() {
     const placeName = '라마다서울신도림호텔';
-    const address = '서울특별시 구로구 경인로 613';
+    const address = '서울특별시 구로구 경인로 624';
     const url = `https://map.naver.com/v5/search/${encodeURIComponent(placeName)}`;
     window.open(url, '_blank');
 }
 
 function openGoogleMap() {
     const placeName = '라마다서울신도림호텔';
-    const address = '서울특별시 구로구 경인로 613';
+    const address = '서울특별시 구로구 경인로 624';
 
     // 구글 지도 검색 URL (모바일/PC 모두 작동)
     const googleMapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`;
@@ -1368,7 +1368,7 @@ function initNaverMap() {
     const contentString = [
         '<div style="padding:10px;min-width:200px;line-height:1.5;">',
         '   <h4 style="margin:0 0 10px 0;font-size:16px;font-weight:bold;">신도림 라마다 호텔 하늘정원홀</h4>',
-        '   <p style="margin:0;font-size:13px;color:#666;">서울특별시 구로구 경인로 613 (구로동)</p>',
+        '   <p style="margin:0;font-size:13px;color:#666;">서울특별시 구로구 경인로 624 (구로동)</p>',
         '   <p style="margin:5px 0 0 0;font-size:13px;color:#666;">Tel. 02-2109-5000</p>',
         '</div>'
     ].join('');
