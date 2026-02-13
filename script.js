@@ -745,6 +745,8 @@ function showMoreMessages() {
 
 // 비밀번호 모달 관련 변수
 let currentDeleteMessageId = null;
+let currentEditMessageId = null;
+let passwordModalMode = null; // 'delete' or 'edit'
 
 // 방명록 삭제 (Firebase)
 function deleteMessage(messageId) {
@@ -758,6 +760,7 @@ function deleteMessage(messageId) {
 
     // 삭제할 메시지 ID 저장 및 모달 표시
     currentDeleteMessageId = messageId;
+    passwordModalMode = 'delete';
     showPasswordModal();
 }
 
@@ -779,9 +782,11 @@ function closePasswordModal() {
         modal.style.display = 'none';
     }
     currentDeleteMessageId = null;
+    currentEditMessageId = null;
+    passwordModalMode = null;
 }
 
-// 비밀번호 확인 및 삭제
+// 비밀번호 확인 및 삭제/수정
 async function confirmPassword() {
     const input = document.getElementById('passwordInput');
     const password = input ? input.value : '';
@@ -791,6 +796,15 @@ async function confirmPassword() {
         return;
     }
 
+    if (passwordModalMode === 'delete') {
+        await confirmDeletePassword(password);
+    } else if (passwordModalMode === 'edit') {
+        confirmEditPassword(password);
+    }
+}
+
+// 삭제 비밀번호 확인
+async function confirmDeletePassword(password) {
     const messages = window.allMessages || [];
     const message = messages.find(m => m.id === currentDeleteMessageId);
 
@@ -818,6 +832,49 @@ async function confirmPassword() {
     }
 }
 
+// 수정 비밀번호 확인
+function confirmEditPassword(password) {
+    const messages = window.allMessages || [];
+    const message = messages.find(m => m.id === currentEditMessageId);
+
+    if (!message) {
+        closePasswordModal();
+        showToast('메시지를 찾을 수 없습니다');
+        return;
+    }
+
+    if (password !== message.password) {
+        showToast('비밀번호가 일치하지 않습니다');
+        return;
+    }
+
+    // 비밀번호가 맞으면 수정 폼 표시
+    closePasswordModal();
+    const nameInput = document.getElementById('guestName');
+    const passwordInput = document.getElementById('guestPassword');
+    const messageInput = document.getElementById('guestMessage');
+    const form = document.getElementById('guestbookForm');
+    const submitButton = document.getElementById('guestbookSubmitBtn');
+
+    if (nameInput && passwordInput && messageInput && form) {
+        nameInput.value = message.name;
+        passwordInput.value = message.password;
+        messageInput.value = message.message;
+
+        // 수정 모드로 설정 (messageId 저장)
+        editingMessageId = currentEditMessageId;
+
+        // 버튼 텍스트 변경
+        if (submitButton) {
+            submitButton.textContent = '메시지 수정하기';
+        }
+
+        // 폼 표시
+        form.style.display = 'block';
+        messageInput.focus();
+    }
+}
+
 // 방명록 수정 (Firebase)
 function editMessage(messageId) {
     const messages = window.allMessages || [];
@@ -828,43 +885,10 @@ function editMessage(messageId) {
         return;
     }
 
-    // 비밀번호 확인
-    const password = prompt('비밀번호를 입력해주세요:');
-
-    if (password === null) {
-        return;
-    }
-
-    if (password !== message.password) {
-        showToast('비밀번호가 일치하지 않습니다');
-        return;
-    }
-
-    // 비밀번호가 맞으면 수정 폼 표시
-    const nameInput = document.getElementById('guestName');
-    const passwordInput = document.getElementById('guestPassword');
-    const messageInput = document.getElementById('guestMessage');
-    const form = document.getElementById('guestbookForm');
-        const submitButton = document.getElementById('guestbookSubmitBtn');
-
-    if (nameInput && passwordInput && messageInput && form) {
-        nameInput.value = message.name;
-        passwordInput.value = message.password;
-        messageInput.value = message.message;
-
-        // 수정 모드로 설정 (messageId 저장)
-        editingMessageId = messageId;
-
-        // 버튼 텍스트 변경
-        if (submitButton) {
-            submitButton.textContent = '메시지 수정하기';
-        }
-
-        form.style.display = 'block';
-
-        // 폼이 보이도록 스크롤
-        form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    // 수정할 메시지 ID 저장 및 모달 표시
+    currentEditMessageId = messageId;
+    passwordModalMode = 'edit';
+    showPasswordModal();
 }
 
 // XSS 방지를 위한 HTML 이스케이프
