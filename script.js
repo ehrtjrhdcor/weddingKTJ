@@ -590,20 +590,20 @@ document.addEventListener('keydown', function(event) {
 
 // 지도 앱 열기
 function openKakaoMap() {
-    const placeName = '신도림 라마다 호텔';
+    const placeName = '라마다서울신도림호텔';
     const url = `https://map.kakao.com/link/search/${encodeURIComponent(placeName)}`;
     window.open(url, '_blank');
 }
 
 function openNaverMap() {
-    const placeName = '신도림 라마다 호텔';
+    const placeName = '라마다서울신도림호텔';
     const address = '서울특별시 구로구 경인로 613';
     const url = `https://map.naver.com/v5/search/${encodeURIComponent(placeName)}`;
     window.open(url, '_blank');
 }
 
 function openGoogleMap() {
-    const placeName = '신도림 라마다 호텔';
+    const placeName = '라마다서울신도림호텔';
     const address = '서울특별시 구로구 경인로 613';
 
     // 구글 지도 검색 URL (모바일/PC 모두 작동)
@@ -612,7 +612,7 @@ function openGoogleMap() {
 }
 
 function openTmap() {
-    const placeName = '신도림 라마다 호텔';
+    const placeName = '라마다서울신도림호텔';
     const latitude = 37.508417;  // 위도 (37°30'30.3"N)
     const longitude = 126.890889; // 경도 (126°53'27.2"E)
 
@@ -635,7 +635,7 @@ function openTmap() {
 }
 
 function openKakaoNavi() {
-    const placeName = '신도림 라마다 호텔';
+    const placeName = '라마다서울신도림호텔';
     const latitude = 37.508417;  // 위도 (37°30'30.3"N)
     const longitude = 126.890889; // 경도 (126°53'27.2"E)
     // 카카오내비 앱 스킴 (좌표로 목적지 설정)
