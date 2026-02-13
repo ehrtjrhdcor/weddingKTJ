@@ -407,13 +407,19 @@ function openTmap() {
     // Tmap 앱 스킴
     const tmapUrl = `tmap://route?goalname=${encodeURIComponent(placeName)}&goalx=${longitude}&goaly=${latitude}`;
 
-    // 앱 스킴 시도
-    window.location.href = tmapUrl;
+    // 모바일에서 앱 스킴 시도
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-    // 1초 후 앱이 안 열리면 Tmap 웹으로 폴백
-    setTimeout(() => {
-        window.open(`https://tmap.life/`, '_blank');
-    }, 1000);
+    if (isMobile) {
+        window.location.href = tmapUrl;
+        // 앱이 없으면 2초 후 구글 지도로 폴백
+        setTimeout(() => {
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`, '_blank');
+        }, 2000);
+    } else {
+        // PC에서는 바로 구글 지도
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`, '_blank');
+    }
 }
 
 function openKakaoNavi() {
