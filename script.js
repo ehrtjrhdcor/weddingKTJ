@@ -1081,7 +1081,7 @@ function initNaverMap() {
 // Kakao SDK 초기화
 if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
     // ⭐ Kakao JavaScript 키 입력 (https://developers.kakao.com)
-    Kakao.init('YOUR_KAKAO_JAVASCRIPT_KEY');
+    Kakao.init('9b9366a14725760d4f3c6715de4d42ef');
     console.log('Kakao SDK 초기화 완료:', Kakao.isInitialized());
 }
 
