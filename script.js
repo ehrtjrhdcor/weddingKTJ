@@ -1342,7 +1342,7 @@ function initNaverMap() {
 
     // ⭐ 예식장 좌표 설정 (여기를 변경하세요!)
     // 좌표 찾는 법: 네이버 지도에서 예식장 검색 → 주소 복사 → "좌표 변환" 검색
-    const weddingLocation = new naver.maps.LatLng(37.5084, 126.8909);  // 신도림 라마다 호텔
+    const weddingLocation = new naver.maps.LatLng(37.508429, 126.890891);  // 라마다 신도림 호텔
 
     // 지도 옵션
     const mapOptions = {
