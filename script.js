@@ -613,8 +613,8 @@ function openGoogleMap() {
 
 function openTmap() {
     const placeName = '라마다서울신도림호텔';
-    const latitude = 37.508417;  // 위도 (37°30'30.3"N)
-    const longitude = 126.890889; // 경도 (126°53'27.2"E)
+    const latitude = 37.506601;  // 위도
+    const longitude = 126.885321; // 경도
 
     // Tmap 앱 스킴
     const tmapUrl = `tmap://route?goalname=${encodeURIComponent(placeName)}&goalx=${longitude}&goaly=${latitude}`;
@@ -636,8 +636,8 @@ function openTmap() {
 
 function openKakaoNavi() {
     const placeName = '라마다서울신도림호텔';
-    const latitude = 37.508417;  // 위도 (37°30'30.3"N)
-    const longitude = 126.890889; // 경도 (126°53'27.2"E)
+    const latitude = 37.506601;  // 위도
+    const longitude = 126.885321; // 경도
     // 카카오내비 앱 스킴 (좌표로 목적지 설정)
     const kakaoNaviUrl = `kakaomap://route?ep=${latitude},${longitude}&by=CAR`;
 
@@ -1340,9 +1340,9 @@ function initNaverMap() {
         return;
     }
 
-    // ⭐ 예식장 좌표 설정 (37°30'30.3"N 126°53'27.2"E)
-    // 좌표 찾는 법: 네이버 지도에서 예식장 검색 → 주소 복사 → "좌표 변환" 검색
-    const weddingLocation = new naver.maps.LatLng(37.508417, 126.890889);  // 라마다 신도림 호텔
+    // ⭐ 예식장 좌표 설정 (라마다서울신도림호텔)
+    // 좌표 찾는 법: 네이버 지도에서 예식장 검색 → 주�표 복사
+    const weddingLocation = new naver.maps.LatLng(37.506601, 126.885321);  // 라마다서울신도림호텔
 
     // 지도 옵션
     const mapOptions = {
