@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initCalendar();
     initCountdown();
     initGallery();
-    initNaverMap();
+    // initNaverMap(); // 현재 구글 지도 사용 중
 
     // 비밀번호 입력창 Enter 키 이벤트
     const passwordInput = document.getElementById('passwordInput');
@@ -1112,6 +1112,10 @@ function initCountdown() {
 }
 
 // 네이버 지도 초기화 - 여기서 예식장 좌표를 변경하세요
+// ============================================
+// 네이버 지도 초기화 (현재 구글 지도 사용 중 - 필요시 주석 해제)
+// ============================================
+/*
 function initNaverMap() {
     // 네이버 지도 API가 로드되었는지 확인
     if (typeof naver === 'undefined') {
@@ -1175,6 +1179,7 @@ function initNaverMap() {
     // 기본으로 정보창 열어두기
     infowindow.open(map, marker);
 }
+*/
 
 // ============================================
 // 카카오톡 공유하기 - 여기서 정보를 변경하세요
