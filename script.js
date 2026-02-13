@@ -998,7 +998,7 @@ function initCountdown() {
 
         // 날짜 메시지 업데이트
         if (weddingDayCount) {
-            weddingDayCount.textContent = days + 1;
+            weddingDayCount.textContent = days;
         }
     }
 
