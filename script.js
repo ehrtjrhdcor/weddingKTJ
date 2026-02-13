@@ -11,15 +11,15 @@ let displayedMessageCount = 3;
 // Firebase 방명록 전체 데이터 (전역 저장)
 window.allMessages = [];
 const galleryImages = [
-    'images/4.jpg',
-    'images/10.jpg',
-    'images/11.jpg',
-    'images/45.jpg',
-    'images/22.jpg',
-    'images/24.jpg',
-    'images/32.jpg',
-    'images/26.jpg',
-    'images/17.jpg'
+    'images/IMG_0024.jpg',
+    'images/IMG_0509.jpg',
+    'images/IMG_0522.jpg',
+    'images/IMG_0526.jpg',
+    'images/IMG_0528.jpg',
+    'images/IMG_0531.jpg',
+    'images/IMG_0532.jpg',
+    'images/IMG_0533.jpg',
+    'images/IMG_0535.jpg'
 ];
 
 // 페이지 로드 시 초기화
@@ -913,8 +913,8 @@ function initCalendar() {
     if (!calendarGrid) return;
 
     // ⭐ 결혼식 날짜 설정 (여기를 변경하세요!)
-    const year = 2025;  // 결혼식 년도
-    const month = 2; // 결혼식 월 (0=1월, 1=2월, 2=3월, ..., 11=12월)
+    const year = 2026;  // 결혼식 년도
+    const month = 3; // 결혼식 월 (0=1월, 1=2월, 2=3월, ..., 11=12월)
     const weddingDay = 22;  // 결혼식 일
 
     // 해당 월의 첫 번째 날짜
@@ -969,7 +969,7 @@ function initCountdown() {
     if (!countdownDays || !countdownHours || !countdownMinutes || !countdownSeconds) return;
 
     // ⭐ 결혼식 날짜와 시간 설정 (여기를 변경하세요!)
-    const weddingDate = new Date('2025-03-22T15:40:00');
+    const weddingDate = new Date('2026-03-22T15:40:00');
 
     function updateCountdown() {
         const now = new Date();
@@ -1097,19 +1097,19 @@ function shareKakao() {
         content: {
             // ⭐ 공유 메시지 내용 변경
             title: '김태진 ♡ 강소현 결혼식에 초대합니다.',
-            description: '2025년 3월 22일 토요일 오후 3시 40분 \n신도림 라마다 호텔 하늘정원홀',
-            imageUrl: 'YOUR_THUMBNAIL_IMAGE_URL',  // ⭐ 썸네일 이미지 URL
+            description: '2026년 3월 22일 일요일 오후 3시 40분 \n서울 라마다 신도림 호텔 하늘정원홀',
+            imageUrl: 'https://ehrtjrhdcor.github.io/weddingKTJ/images/IMG_8687_INV.jpg',  // ⭐ 썸네일 이미지 URL
             link: {
-                mobileWebUrl: 'YOUR_WEDDING_WEBSITE_URL',  // ⭐ 청첩장 URL
-                webUrl: 'YOUR_WEDDING_WEBSITE_URL',
+                mobileWebUrl: 'https://ehrtjrhdcor.github.io/weddingKTJ/',  // ⭐ 청첩장 URL
+                webUrl: 'https://ehrtjrhdcor.github.io/weddingKTJ/',
             },
         },
         buttons: [
             {
                 title: '모바일 청첩장 보기',
                 link: {
-                    mobileWebUrl: 'YOUR_WEDDING_WEBSITE_URL',  // ⭐ 청첩장 URL
-                    webUrl: 'YOUR_WEDDING_WEBSITE_URL',
+                    mobileWebUrl: 'https://ehrtjrhdcor.github.io/weddingKTJ/',  // ⭐ 청첩장 URL
+                    webUrl: 'https://ehrtjrhdcor.github.io/weddingKTJ/',
                 },
             },
         ],

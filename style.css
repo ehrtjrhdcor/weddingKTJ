@@ -948,6 +948,76 @@ h3.venue-name {
     background-color: #c69563;
 }
 
+/* 신부측 피로연 */
+.reception {
+    background-color: #f9f9f9;
+    padding: 40px 0;
+}
+
+.reception-label {
+    font-family: 'Crimson Pro', serif;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-light);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.reception-title {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: #000000;
+    position: relative;
+    padding-bottom: 12px;
+}
+
+.reception-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 1px;
+    background: #dddddd;
+}
+
+.reception-info {
+    text-align: center;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    margin: 0 auto;
+    max-width: 400px;
+}
+
+.reception-date {
+    font-size: 16px;
+    color: #000000;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.reception-time {
+    font-size: 14px;
+    color: #888888;
+    margin-bottom: 20px;
+}
+
+.reception-venue-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000000;
+    margin-bottom: 8px;
+}
+
+.reception-venue-address {
+    font-size: 14px;
+    color: #666666;
+}
+
 /* 계좌 */
 .account {
     background-color: var(--background);
