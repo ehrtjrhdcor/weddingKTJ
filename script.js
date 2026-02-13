@@ -390,13 +390,30 @@ function openNaverMap() {
     window.open(url, '_blank');
 }
 
-function openTmap() {
+function openGoogleMap() {
     const placeName = '신도림 라마다 호텔';
     const address = '서울특별시 구로구 경인로 613';
 
     // 구글 지도 검색 URL (모바일/PC 모두 작동)
     const googleMapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`;
     window.open(googleMapUrl, '_blank');
+}
+
+function openTmap() {
+    const placeName = '신도림 라마다 호텔';
+    const latitude = 37.5084;  // 위도
+    const longitude = 126.8909; // 경도
+
+    // Tmap 앱 스킴
+    const tmapUrl = `tmap://route?goalname=${encodeURIComponent(placeName)}&goalx=${longitude}&goaly=${latitude}`;
+
+    // 앱 스킴 시도
+    window.location.href = tmapUrl;
+
+    // 1초 후 앱이 안 열리면 Tmap 웹으로 폴백
+    setTimeout(() => {
+        window.open(`https://tmap.life/`, '_blank');
+    }, 1000);
 }
 
 function openKakaoNavi() {
