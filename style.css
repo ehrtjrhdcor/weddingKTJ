@@ -2027,3 +2027,93 @@ h3.venue-name {
     }
 }
 
+
+/* 비밀번호 확인 모달 */
+.password-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s;
+}
+
+.password-modal-content {
+    background-color: white;
+    margin: 20% auto;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s;
+}
+
+.password-modal-title {
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #000;
+}
+
+.password-modal-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.password-modal-input:focus {
+    outline: none;
+    border-color: #d4a574;
+}
+
+.password-modal-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.password-modal-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.password-modal-btn.cancel {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.password-modal-btn.cancel:hover {
+    background-color: #e0e0e0;
+}
+
+.password-modal-btn.confirm {
+    background-color: #d4a574;
+    color: white;
+}
+
+.password-modal-btn.confirm:hover {
+    background-color: #c69563;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

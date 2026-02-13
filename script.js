@@ -35,6 +35,16 @@ document.addEventListener('DOMContentLoaded', function() {
     initCountdown();
     initGallery();
     initNaverMap();
+
+    // 비밀번호 입력창 Enter 키 이벤트
+    const passwordInput = document.getElementById('passwordInput');
+    if (passwordInput) {
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                confirmPassword();
+            }
+        });
+    }
 });
 
 // 갤러리 초기화
@@ -733,8 +743,11 @@ function showMoreMessages() {
     loadMessages();
 }
 
+// 비밀번호 모달 관련 변수
+let currentDeleteMessageId = null;
+
 // 방명록 삭제 (Firebase)
-async function deleteMessage(messageId) {
+function deleteMessage(messageId) {
     const messages = window.allMessages || [];
     const message = messages.find(m => m.id === messageId);
 
@@ -743,10 +756,47 @@ async function deleteMessage(messageId) {
         return;
     }
 
-    // 비밀번호 확인
-    const password = prompt('비밀번호를 입력해주세요:');
+    // 삭제할 메시지 ID 저장 및 모달 표시
+    currentDeleteMessageId = messageId;
+    showPasswordModal();
+}
 
-    if (password === null) {
+// 비밀번호 모달 표시
+function showPasswordModal() {
+    const modal = document.getElementById('passwordModal');
+    const input = document.getElementById('passwordInput');
+    if (modal && input) {
+        modal.style.display = 'block';
+        input.value = '';
+        input.focus();
+    }
+}
+
+// 비밀번호 모달 닫기
+function closePasswordModal() {
+    const modal = document.getElementById('passwordModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    currentDeleteMessageId = null;
+}
+
+// 비밀번호 확인 및 삭제
+async function confirmPassword() {
+    const input = document.getElementById('passwordInput');
+    const password = input ? input.value : '';
+
+    if (!password) {
+        showToast('비밀번호를 입력해주세요');
+        return;
+    }
+
+    const messages = window.allMessages || [];
+    const message = messages.find(m => m.id === currentDeleteMessageId);
+
+    if (!message) {
+        closePasswordModal();
+        showToast('메시지를 찾을 수 없습니다');
         return;
     }
 
@@ -759,7 +809,8 @@ async function deleteMessage(messageId) {
     const { deleteDoc, doc } = window.firestoreModules;
 
     try {
-        await deleteDoc(doc(window.db, 'guestbook', messageId));
+        await deleteDoc(doc(window.db, 'guestbook', currentDeleteMessageId));
+        closePasswordModal();
         showToast('메시지가 삭제되었습니다');
     } catch (error) {
         console.error('삭제 오류:', error);

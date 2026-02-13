@@ -188,6 +188,18 @@
         </div>
     </div>
 
+    <!-- 비밀번호 확인 모달 -->
+    <div id="passwordModal" class="password-modal" style="display: none;">
+        <div class="password-modal-content">
+            <h3 class="password-modal-title">비밀번호 확인</h3>
+            <input type="password" id="passwordInput" class="password-modal-input" placeholder="비밀번호를 입력하세요" maxlength="20">
+            <div class="password-modal-buttons">
+                <button class="password-modal-btn cancel" onclick="closePasswordModal()">취소</button>
+                <button class="password-modal-btn confirm" onclick="confirmPassword()">확인</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 오시는 길 -->
     <section class="location">
         <div class="container">
