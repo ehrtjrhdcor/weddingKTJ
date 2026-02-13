@@ -1,6 +1,6 @@
 // 현재 이미지 인덱스
 let currentImageIndex = 0;
-const totalImages = 9;
+const totalImages = 11;
 
 // 방명록 수정 모드 (Firebase용 - messageId 저장)
 let editingMessageId = null;
@@ -19,7 +19,9 @@ const galleryImages = [
     'images/IMG_0531.jpg',
     'images/IMG_0532.jpg',
     'images/IMG_0533.jpg',
-    'images/IMG_0535.jpg'
+    'images/IMG_0535.jpg',
+    'images/IMG_0398.jpg',
+    'images/IMG_0534.jpg'
 ];
 
 // 페이지 로드 시 초기화
